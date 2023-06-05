@@ -1,0 +1,7 @@
+SELECT * FROM CATEGORIES INNER JOIN PARAMETRES 
+ON CATEGORIES.categorie_id = PARAMETRES.parametre_id
+INNER JOIN DONNEES ON DONNEES.donnees_id = CATEGORIES.donnees_id 
+WHERE CATEGORIES.type_parametre="Pression";
+
+
+

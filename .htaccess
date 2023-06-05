@@ -1,0 +1,4 @@
+RewriteEngine On
+RewriteBase /
+
+RewriteRule ^var/www/html/Systeme_de_visualisation_de_mod%C3%A8le_de_donn%C3%A9es_WRF/DATASET/2019051500_OP1/(.*)$ /Systeme_de_visualisation_de_modèle_de_données_WRF/DATASET/2019051500_OP1/$1 [L,NC,R=301]

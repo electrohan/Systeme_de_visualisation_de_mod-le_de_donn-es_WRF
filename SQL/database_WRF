@@ -1,0 +1,60 @@
+-- Database: database_WRF
+
+-- DROP DATABASE IF EXISTS "database_WRF";
+
+CREATE DATABASE "database_WRF"
+    WITH
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'fr_FR.UTF-8'
+    LC_CTYPE = 'fr_FR.UTF-8'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1
+    IS_TEMPLATE = False;
+	
+	
+	--création de la table ROUND--
+	CREATE TABLE ROUND(
+		round_id SERIAL PRIMARY KEY,
+		DateDebutRound TIMESTAMP,
+		DateFinRound TIMESTAMP
+	);
+	
+	SELECT * FROM ROUND;
+	
+	--créarion de la table DONNEES--
+	CREATE TABLE DONNEES(
+		donnees_id SERIAL PRIMARY KEY,
+		IntituleDonnees VARCHAR(40) NOT NULL,
+		LongueurDonnees NUMERIC(4,1),
+		LargeurDonnees NUMERIC(4,1),
+		TailleDonnees NUMERIC(4,2)
+	);
+	
+	SELECT * FROM DONNEES;
+	
+	--Modification de la table DONNEES--
+	ALTER TABLE DONNEES ADD COLUMN CheminDonnees VARCHAR(255);
+	ALTER TABLE DONNEES ADD COLUMN parametre_id INT REFERENCES PARAMETRES(parametre_id);
+	--Modification de la table ROUND--
+	ALTER TABLE ROUND ADD COLUMN donnees_id INT REFERENCES DONNEES(donnees_id);
+	
+	SELECT * FROM ROUND;
+	--création de la table PARAMETRES--
+	
+	CREATE TABLE PARAMETRES(
+		parametre_id SERIAL PRIMARY KEY,
+		nom_parametre VARCHAR(30),
+		type_parametre VARCHAR(15)
+	);
+	SELECT * FROM PARAMETRES;
+	
+	--création de la table héritière PRESSION--
+	CREATE TABLE PRESSION(
+    altitude INT,
+    CONSTRAINT fk_parametre_id FOREIGN KEY (parametre_id)
+        REFERENCES PARAMETRES(parametre_id)
+) INHERITS (PARAMETRES);
+
+SELECT * FROM PRESSION;
+	

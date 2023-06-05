@@ -1,0 +1,18 @@
+.bordure {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.bordure th,
+.bordure td {
+  text-align: left;
+  padding: 8px;
+}
+
+.bordure th {
+  background-color: #dddddd;
+}
+
+.bordure td {
+  border: 1px solid #dddddd;
+}
