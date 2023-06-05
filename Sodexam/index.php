@@ -10,6 +10,7 @@ init_php_session();
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
   <link rel="stylesheet" href="../CSS/home.css" />
 
 </head>
@@ -75,7 +76,7 @@ init_php_session();
                 <textarea name="" id="" cols="30" rows="10"></textarea>
               </div>
               <div class="pdf esp">
-                <button>télécharger</button>
+                <button class="generateur">télécharger</button>
               </div>
             </div>
         </div>
@@ -134,6 +135,23 @@ init_php_session();
   <script src="../JAVASCRIPT/GetDataImage.js"></script>
   <script src="../JAVASCRIPT/GetDataCategorie.js"></script>
   <script src="../JAVASCRIPT/app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.es.min.js" integrity="sha512-3chOMtjYaSa9m2bCC8qGxmEcX449u63D1fMXMQdueS3/XgE12iHQdmZVXVVbhBLc9i7h9WUuuM15B0CCE6Jtvg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    $(document).ready(function(){
+      function generatePDF(){
+        var doc = new jsPDF();
+
+        doc.text("Hello world!", 10, 10);
+        doc.save("a4.pdf");
+      }
+      $(".generateur").on("click", function(event) {
+        event.preventDefault(); // empêche la page de se recharger
+        console.log("bouton cliqué");
+        generatePDF();
+      });
+    });
+  </script>
+
   <?php else:?>
         <?php header('Location: ../Sodexam/login.php');?>
   <?php endif?>
