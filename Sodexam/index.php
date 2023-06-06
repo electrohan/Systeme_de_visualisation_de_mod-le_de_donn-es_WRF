@@ -61,7 +61,10 @@ init_php_session();
         </div>
         <div class="affichage">
           <div class="cartes">
-            <img src="" width="600px" height="500px" alt="">
+            <div>
+              <img src="" width="600px" height="500px" alt="" id="map">
+            </div>
+
             <div class="analyse">
               <select name="" id="">
                 <option value="">les 72 dernières heures</option>
@@ -135,30 +138,16 @@ init_php_session();
     <script src="../JAVASCRIPT/GetDataImage.js"></script>
     <script src="../JAVASCRIPT/GetDataCategorie.js"></script>
     <script src="../JAVASCRIPT/app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.8.0/html2pdf.bundle.min.js" integrity="sha512-w3u9q/DeneCSwUDjhiMNibTRh/1i/gScBVp2imNVAMCt6cUHIw6xzhzcPFIaL3Q1EbI2l+nu17q2aLJJLo4ZYg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
       $(document).ready(function() {
         function generatePDF() {
+
+
           const doc = new jsPDF();
           var pageHeight = doc.internal.pageSize.height;
           var pageWidth = doc.internal.pageSize.width;
-
-          // Ajouter l'image en haut à gauche
-          var imageElement = new Image();
-          imageElement.onload = function() {
-            var canvas = document.createElement('canvas');
-            canvas.width = this.width;
-            canvas.height = this.height;
-
-            var ctx = canvas.getContext('2d');
-            ctx.drawImage(this, 0, 0);
-            var imageWidth = 50; // Largeur souhaitée de l'image dans le PDF (en mm)
-            var imageHeight = (imageElement.height / imageElement.width) * imageWidth;
-            var imageData = canvas.toDataURL("image/png");
-            doc.addImage(imageElement, "PNG", 10, 10, imageWidth, imageHeight);
-          };
-          imageElement.src = "../images/images-removebg-preview.png";
-
-
 
           // Récupérer le nom depuis la variable de session PHP
           var nom = "<?php echo $_SESSION['previ']; ?>";
@@ -186,35 +175,46 @@ init_php_session();
 
           var lignes = doc.splitTextToSize(valeurTextarea, 180);
           var lineHeight = doc.getLineHeight();
-          var texteY = (pageHeight - lignes.length * lineHeight) / 2;
+          var texteY = (lignes.length * lineHeight) / 2;
 
-          doc.text(lignes, 10, texteY, {
+          doc.text(lignes, 10, 50, {
             align: "center"
           });
+          //ajout du logo au document 
+          var canvas = document.querySelector(".logo");
+          var map = document.querySelector("#map");
+          html2canvas(canvas).then((e) => {
+            var DataImage = e.toDataURL("image/png");
+            doc.addImage(DataImage, "PNG", 10, 15);
+            
+            html2canvas(map,{allowTaint: true,useCORS: true,proxy:"http://127.0.0.1/"}).then((em) => {
+              var mapData = em.toDataURL("image/png");
+              doc.addImage(mapData, "PNG", 50, 80);
+              doc.save("analyse.pdf");
+            })
+          })
+          /*html2pdf().set({
+            filename: "analyse",
+            margin: [10, 10, 10, 10],
+            html2canvas: {
+              scale: 2
+            },
+            jsPDF: {
+              format: 'a4',
+              orientation: 'portrait',
+              autoWidth: true
+            }
+          }).from(map).save();
+*/
 
-          doc.save("analyse.pdf");
         }
 
         $(".generateur").on("click", function(event) {
           event.preventDefault(); // empêche la page de se recharger
           console.log("bouton cliqué");
-
+          //Appel de la fonction 
           generatePDF();
         });
-
-        // Fonction pour convertir l'élément <img> en base64
-        // Fonction pour convertir l'élément en base64
-        function getBase64Image(img) {
-          var canvas = document.createElement("canvas");
-          canvas.width = img.width;
-          canvas.height = img.height;
-
-          var ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0);
-
-          var dataURL = canvas.toDataURL("image/jpeg");
-          return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
-        }
       });
     </script>
   <?php else : ?>
