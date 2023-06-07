@@ -191,24 +191,9 @@ init_php_session();
               var mapData = em.toDataURL("image/png");
               doc.addImage(mapData, "PNG", 50, 80);
               doc.save("analyse.pdf");
-            })
-          })
-          /*html2pdf().set({
-            filename: "analyse",
-            margin: [10, 10, 10, 10],
-            html2canvas: {
-              scale: 2
-            },
-            jsPDF: {
-              format: 'a4',
-              orientation: 'portrait',
-              autoWidth: true
-            }
-          }).from(map).save();
-*/
-
+            });
+          });
         }
-
         $(".generateur").on("click", function(event) {
           event.preventDefault(); // empêche la page de se recharger
           console.log("bouton cliqué");
