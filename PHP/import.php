@@ -1,6 +1,50 @@
 <?php
-// récupération des informations de connexion à la base de données
+//Connexion au serveur distant
+$hostServer = '192.168.10.82';
+$portServer = 22;
+$usernameServer = 'nwp';
+$passwordServer = 'nwp';
 
+// Connexion SSH
+$connexionServer = ssh2_connect($hostServer, $portServer);
+if (!$connexionServer ) {
+    die('Impossible de se connecter au serveur.');
+}
+// Authentification
+if (!ssh2_auth_password($connexionServer , $usernameServer, $passwordServer)) {
+    die('Impossible de s\'authentifier sur le serveur.');
+}
+$sftp = ssh2_sftp($connexionServer );
+
+// Chemin du dossier WRF_OPERATIONAL
+$remoteDir = '/home/nwp/WRF_OPERATIONAL/RUN_IMAGES/GFS';
+$today = date('Ymd'); // Obtenez la date du jour en format '20230702'
+$yesterday = date('Ymd', strtotime('-1 day', strtotime($today))); // Obtenez la date du jour précédent
+$yesterdayFormatted = str_replace('-', '', $yesterday);
+$folderName = $yesterdayFormatted;
+
+$handle = opendir("ssh2.sftp://$sftp$remoteDir");
+if (!$handle) {
+    die('Impossible d\'ouvrir le dossier WRF_OPERATIONAL.');
+}
+while (($entry = readdir($handle)) !== false){
+    if ($entry === '.' || $entry === '..') {
+        continue; // Ignorer les entrées '.' et '..'
+    }
+    if ($entry === $folderName){
+        // Obtenir les informations sur le dossier distant
+        $stat = ssh2_sftp_stat($sftp, "$remoteDir/$entry");
+        if ($stat['mode'] & 040000){
+            $repertoireParent="ssh2.sftp://$sftp$remoteDir/$entry";
+            $innerHandle = opendir("ssh2.sftp://$sftp$remoteDir/$entry");
+            if (!$innerHandle) {
+                die("Impossible d'ouvrir le dossier $entry.");
+            }
+        }
+    }
+}
+
+//récupération des informations de connexion à la base de données
 $host="localhost";
 $port="5432";
 $dbname="database_WRF";
@@ -12,11 +56,13 @@ $options=array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
 //essai de connexion à la base de données avec PDO
 
 try{
+    echo "on est dans le try"."<br>";
     $pdo=new PDO($connexion,$user,$password,$options);
-    $repertoireParent = "/var/www/html/Systeme_de_visualisation_de_modèle_de_données_WRF/DATASET/20230602";
+    //$repertoireParent = "/var/www/html/Systeme_de_visualisation_de_modèle_de_données_WRF/DATASET/20230602";
     $datas=scandir($repertoireParent);
     
     foreach($datas as $repertoire){
+        
         if ($repertoire != "." && $repertoire != ".." && is_dir($repertoireParent . '/' . $repertoire)){
             $cheminRepertoire = $repertoireParent . '/' . $repertoire;
             $fichiers = scandir($cheminRepertoire);
